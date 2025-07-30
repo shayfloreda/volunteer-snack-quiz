@@ -4,26 +4,223 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>What Kind of Volunteer Are You?</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff8f0;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    .quiz-container {
+      max-width: 600px;
+      margin: auto;
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+    }
+    .options label {
+      display: block;
+      margin: 10px 0;
+    }
+    .next-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 20px;
+      font-size: 1em;
+      background: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .result-image {
+      width: 100%;
+      max-width: 480px;
+      height: auto;
+      display: block;
+      margin: 20px auto;
+      border-radius: 16px;
+    }
+    .result {
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
-  <div class="quiz-container" id="quiz">
-    <div id="quiz-header">
-      <h1>What Kind of Volunteer Are You?</h1>
-      <p>Answer the questions and find out which local snack-inspired volunteer archetype you are!</p>
-      <button onclick="startQuiz()">Start Quiz</button>
-    </div>
-    <div id="quiz-question" style="display: none;">
-      <h2 id="question-text"></h2>
-      <div id="answer-buttons" class="btn-container"></div>
-      <button id="next-button" onclick="nextQuestion()">Next</button>
-    </div>
-    <div id="quiz-result" style="display: none;">
-      <h2>Your Volunteer Snack Type:</h2>
-      <p id="result-text"></p>
-      <button onclick="restartQuiz()">Try Again</button>
-    </div>
+  <div class="quiz-container">
+    <div id="quiz"></div>
+    <button class="next-btn" id="nextBtn">Next</button>
   </div>
-  <script src="script.js"></script>
+
+  <script>
+    const quizData = [
+       {
+    question: "What was your favourite subject in school?",
+    options: [
+      "Humanities: History / Literature / Geography / Social Studies – loved understanding people and stories",
+      "Aesthetics: Food & Nutrition (FCE), Design & Technology or Art – loved making and creating",
+      "PE or Outdoor Education – loved moving, playing, and being hands-on",
+      "Student Leadership or Project Work – loved taking initiative",
+      "Science or Math – loved solving complex problems"
+    ]
+  },
+  {
+    question: "During group work, you usually...",
+    options: [
+      "Step up to lead and delegate tasks",
+      "Keep the peace and help everyone get along",
+      "Handle the design, planning, or behind-the-scenes work",
+      "Cheer people on and boost morale",
+      "Focus deeply on the quality of the final product"
+    ]
+  },
+  {
+    question: "On a day off, you’d most likely be...",
+    options: [
+      "At home, reading, journaling, or recharging",
+      "Hanging out with friends at a new café or event",
+      "Volunteering, attending a cause-driven event or helping someone out",
+      "Exploring hidden nature spots or going on a long walk",
+      "Sketching, editing, making music, or working on something creative"
+    ]
+  },
+  {
+    question: "What kind of role do you gravitate to when volunteering?",
+    options: [
+      "Planning and coordination — I like making things run smoothly",
+      "Hosting, speaking, or engaging with the public",
+      "Quiet 1-on-1 interactions — I love listening and connecting deeply",
+      "Fieldwork — I like getting my hands dirty and moving around",
+      "Content creation, visuals, or digital comms"
+    ]
+  },
+  {
+    question: "What motivates you the most when giving your time?",
+    options: [
+      "Seeing others smile or feel heard",
+      "Knowing I’m part of something bigger than myself",
+      "Learning new skills or perspectives",
+      "Helping things run behind the scenes",
+      "Creating something that makes a lasting impact"
+    ]
+  },
+  {
+    question: "As a child, you were known for...",
+    options: [
+      "Being the quiet observer",
+      "Being the leader or class monitor",
+      "Always making new friends",
+      "Drawing, building, or tinkering with things",
+      "Asking questions and being curious"
+    ]
+  },
+  {
+    question: "How do you usually respond to challenges or setbacks?",
+    options: [
+      "Reflect first, then come back with a thoughtful response",
+      "Take action immediately — solutions first!",
+      "Lean on others and talk it through",
+      "Express it creatively or through writing/music",
+      "Keep calm and try to support others too"
+    ]
+  },
+  {
+    question: "Pick the place that feels most like you:",
+    options: [
+      "A cosy library or quiet reading corner",
+      "A theatre, stage, or karaoke room",
+      "A community garden or nature trail",
+      "A makerspace, design studio, or editing room",
+      "A void deck filled with people playing, talking, and connecting"
+    ]
+  },
+  {
+    question: "What kind of people do you enjoy working with most?",
+    options: [
+      "Supportive and empathetic people",
+      "Passionate changemakers",
+      "Fun-loving and spontaneous personalities",
+      "Focused and detail-oriented collaborators",
+      "Diverse, quirky people who accept differences"
+    ]
+  },
+  {
+    question: "If you were to start a ground-up project, what would it be about?",
+    options: [
+      "Supporting mental health through art or expression",
+      "Creating care packs or check-in circles for the elderly or vulnerable",
+      "Advocating for environmental or social causes",
+      "Organising a carnival or festival to bring people together",
+      "Building an inclusive digital or storytelling platform"
+    ]
+  }
+];
+
+    const archetypes = [
+      "Kaya Toast", "Roti Prata", "Kueh Lapis", "Ice Kacang", "Kueh Salat",
+      "Chilli Crab", "Ondeh Ondeh", "Laksa", "Teh Tarik", "Goreng Pisang",
+      "Satay", "Popiah", "Bandung", "Chendol", "Laksa"
+    ];
+
+    const resultMap = [
+      0, 1, 2, 3,
+      4, 5, 6, 7,
+      8, 9, 10, 11,
+      12, 13, 14
+    ];
+
+    const scores = new Array(archetypes.length).fill(0);
+    let currentQuestion = 0;
+
+    const quiz = document.getElementById("quiz");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      quiz.innerHTML = `
+        <div class="question">${q.question}</div>
+        <div class="options">
+          ${q.options.map((opt, i) => `
+            <label>
+              <input type="radio" name="option" value="${i}" /> ${opt}
+            </label>`).join('')}
+        </div>
+      `;
+    }
+
+    function showResult() {
+      const topIndex = scores.indexOf(Math.max(...scores));
+      const resultName = archetypes[topIndex];
+      const imageFileName = resultName.replace(/\s+/g, "%20") + ".png";
+
+      quiz.innerHTML = `
+        <div class="result">
+          <h2>You are most like: <strong>${resultName}</strong>!</h2>
+          <img src="images/${imageFileName}" alt="${resultName}" class="result-image" />
+        </div>
+      `;
+      nextBtn.style.display = 'none';
+    }
+
+    nextBtn.addEventListener("click", () => {
+      const selected = document.querySelector("input[name='option']:checked");
+      if (!selected) return alert("Please select an option!");
+
+      const index = parseInt(selected.value);
+      scores[index % scores.length]++;
+
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    loadQuestion();
+  </script>
 </body>
 </html>
